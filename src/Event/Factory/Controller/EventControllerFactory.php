@@ -45,9 +45,9 @@ class EventControllerFactory implements FactoryInterface
     public function createService(ServiceLocatorInterface $controllers)
     {
         $services = $controllers->getServiceLocator();
-        $eventService = $services->get('Event\Service\Event');
-        $options = $services->get('Event\Options\ModuleOptions');
-        $inputFilter = $services->get('Event\Filter\Event');
+        $eventService = $services->get('MdjamanEvent\Service\Event');
+        $options = $services->get('MdjamanEvent\Options\ModuleOptions');
+        $inputFilter = $services->get('MdjamanEvent\Filter\Event');
         
         $controller = new EventController();
         $controller->setEventService($eventService);

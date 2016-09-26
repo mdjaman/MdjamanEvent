@@ -148,7 +148,7 @@ class EventController extends AbstractActionController
         ];
 
         if ($id === 0) {
-            return $this->forward()->dispatch('Event\Controller\Event', ['action' => 'index']);
+            return $this->forward()->dispatch('MdjamanEvent\Controller\Event', ['action' => 'index']);
         }
 
         try {
@@ -172,7 +172,7 @@ class EventController extends AbstractActionController
             }
 
             $this->flashMessenger()->addMessage(_('Evènement introuvable'));
-            return $this->forward()->dispatch('Event\Controller\Event', ['action' => 'index']);
+            return $this->forward()->dispatch('MdjamanEvent\Controller\Event', ['action' => 'index']);
         }
 
         if ($request->isXmlHttpRequest()) {
@@ -212,7 +212,7 @@ class EventController extends AbstractActionController
         $id = $this->params()->fromRoute('alias', '');
 
         if ($id === '') {
-            return $this->forward()->dispatch('Event\Controller\Event', ['action' => 'index']);
+            return $this->forward()->dispatch('MdjamanEvent\Controller\Event', ['action' => 'index']);
         }
 
         $service = $this->getEventService();
@@ -240,7 +240,7 @@ class EventController extends AbstractActionController
             }
 
             $this->flashMessenger()->addMessage($errMessage);
-            return $this->forward()->dispatch('Event\Controller\Event', ['action' => 'index']);
+            return $this->forward()->dispatch('MdjamanEvent\Controller\Event', ['action' => 'index']);
         }
 
         if ($request->isXmlHttpRequest()) {
@@ -296,7 +296,7 @@ class EventController extends AbstractActionController
         $id = $this->params()->fromRoute('alias', '');
 
         if ($id === '') {
-            return $this->forward()->dispatch('Event\Controller\Event', ['action' => 'index']);
+            return $this->forward()->dispatch('MdjamanEvent\Controller\Event', ['action' => 'index']);
         }
 
         $service = $this->getEventService();

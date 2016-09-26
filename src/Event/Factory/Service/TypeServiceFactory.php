@@ -44,7 +44,7 @@ class TypeServiceFactory implements FactoryInterface
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
         $om = $serviceLocator->get('doctrine.entitymanager.orm_default');
-        $options = $serviceLocator->get('Event\Options\ModuleOptions');
+        $options = $serviceLocator->get('MdjamanEvent\Options\ModuleOptions');
         
         $service = new TypeService($serviceLocator, $om, $options);
         return $service;

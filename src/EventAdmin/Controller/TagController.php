@@ -131,7 +131,7 @@ class TagController extends AbstractActionController
         ];
 
         if ($id === 0) {
-            return $this->forward()->dispatch('EventAdmin\Controller\Tag', ['action' => 'index']);
+            return $this->forward()->dispatch('MdjamanEventAdmin\Controller\Tag', ['action' => 'index']);
         }
 
         try {
@@ -155,7 +155,7 @@ class TagController extends AbstractActionController
             }
 
             $this->flashMessenger()->addMessage(_('Mot-clé introuvable'));
-            return $this->forward()->dispatch('EventAdmin\Controller\Tag', ['action' => 'index']);
+            return $this->forward()->dispatch('MdjamanEventAdmin\Controller\Tag', ['action' => 'index']);
         }
 
         if ($request->isXmlHttpRequest()) {
@@ -269,7 +269,7 @@ class TagController extends AbstractActionController
                 return new JsonModel($resultJson);
             }
 
-            return $this->forward()->dispatch('EventAdmin\Controller\Tag', array('action' => 'index'));
+            return $this->forward()->dispatch('MdjamanEventAdmin\Controller\Tag', array('action' => 'index'));
         }
 
         if ($request->isPost()) {

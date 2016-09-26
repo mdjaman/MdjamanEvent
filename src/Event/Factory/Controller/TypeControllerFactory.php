@@ -45,10 +45,10 @@ class TypeControllerFactory implements FactoryInterface
     public function createService(ServiceLocatorInterface $controllers)
     {
         $services = $controllers->getServiceLocator();
-        $typeService = $services->get('Event\Service\Type');
-        $eventService = $services->get('Event\Service\Event');
-        $options = $services->get('Event\Options\ModuleOptions');
-        $inputFilter = $services->get('Event\Filter\Event');
+        $typeService = $services->get('MdjamanEvent\Service\Type');
+        $eventService = $services->get('MdjamanEvent\Service\Event');
+        $options = $services->get('MdjamanEvent\Options\ModuleOptions');
+        $inputFilter = $services->get('MdjamanEvent\Filter\Event');
         
         $controller = new TypeController();
         $controller->setTypeService($typeService);

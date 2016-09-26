@@ -135,7 +135,7 @@ class EventController extends AbstractActionController
         ];
 
         if ($id === 0) {
-            return $this->forward()->dispatch('EventAdmin\Controller\Event', ['action' => 'index']);
+            return $this->forward()->dispatch('MdjamanEventAdmin\Controller\Event', ['action' => 'index']);
         }
 
         try {
@@ -159,7 +159,7 @@ class EventController extends AbstractActionController
             }
 
             $this->flashMessenger()->addMessage(_('Evènement introuvable'));
-            return $this->forward()->dispatch('EventAdmin\Controller\Event', ['action' => 'index']);
+            return $this->forward()->dispatch('MdjamanEventAdmin\Controller\Event', ['action' => 'index']);
         }
 
         if ($request->isXmlHttpRequest()) {
@@ -366,7 +366,7 @@ class EventController extends AbstractActionController
                 return new JsonModel($resultJson);
             }
 
-            return $this->forward()->dispatch('EventAdmin\Controller\Event', array('action' => 'index'));
+            return $this->forward()->dispatch('MdjamanEventAdmin\Controller\Event', array('action' => 'index'));
         }
 
         if ($request->isPost()) {

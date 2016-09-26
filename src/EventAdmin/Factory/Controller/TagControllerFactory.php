@@ -45,9 +45,9 @@ class TagControllerFactory implements FactoryInterface
     public function createService(ServiceLocatorInterface $controllers)
     {
         $services = $controllers->getServiceLocator();
-        $tagService = $services->get('Event\Service\Tag');
-        $options = $services->get('Event\Options\ModuleOptions');
-        $inputFilter = $services->get('Event\Filter\Tag');
+        $tagService = $services->get('MdjamanEvent\Service\Tag');
+        $options = $services->get('MdjamanEvent\Options\ModuleOptions');
+        $inputFilter = $services->get('MdjamanEvent\Filter\Tag');
         
         $controller = new TagController();
         $controller->setTagService($tagService);

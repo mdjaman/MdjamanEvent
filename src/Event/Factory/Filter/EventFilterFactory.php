@@ -44,7 +44,7 @@ class EventFilterFactory implements FactoryInterface
      */
     public function createService(ServiceLocatorInterface $sl)
     {
-        $typeRepository = $sl->get('Event\Repository\Type');
+        $typeRepository = $sl->get('MdjamanEvent\Repository\Type');
 
         $filter = new EventFilter($typeRepository);
         return $filter;

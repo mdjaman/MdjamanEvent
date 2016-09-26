@@ -43,7 +43,7 @@ class TypeRepositoryFactory implements FactoryInterface
      */
     public function createService(ServiceLocatorInterface $sl)
     {
-        $options = $sl->get('Event\Options\ModuleOptions');
+        $options = $sl->get('MdjamanEvent\Options\ModuleOptions');
         $class = $options->getTypeEntityClass();
         $om = $sl->get('doctrine.entitymanager.orm_default');
         $repository = $om->getRepository($class);

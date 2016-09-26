@@ -48,8 +48,8 @@ class EventFormFactory implements FactoryInterface
     {
         $om = $serviceLocator->get('doctrine.entitymanager.orm_default');
         /* @var $options ModuleOptionsInterface */
-        $options = $serviceLocator->get('Event\Options\ModuleOptions');
-        $filter = $serviceLocator->get('Event\Filter\Event');
+        $options = $serviceLocator->get('MdjamanEvent\Options\ModuleOptions');
+        $filter = $serviceLocator->get('MdjamanEvent\Filter\Event');
         $typeEntityClassName = $options->getTypeEntityClass();
 
         $hydrator = new DoctrineObject($om);

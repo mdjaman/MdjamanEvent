@@ -42,17 +42,17 @@ class ModuleOptions extends AbstractOptions implements ModuleOptionsInterface
     /**
      * @var string
      */
-    protected $eventEntityClass = 'Event\Entity\Event';
+    protected $eventEntityClass = 'MdjamanEvent\Entity\Event';
 
     /**
      * @var string
      */
-    protected $typeEntityClass = 'Event\Entity\Type';
+    protected $typeEntityClass = 'MdjamanEvent\Entity\Type';
 
     /**
      * @var string
      */
-    protected $tagEntityClass = 'Event\Entity\Tag';
+    protected $tagEntityClass = 'MdjamanEvent\Entity\Tag';
 
     /**
      * @var int

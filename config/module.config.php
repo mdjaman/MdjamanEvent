@@ -32,11 +32,11 @@ return array(
             'MdjamanEvent\Service\Type'             => \MdjamanEvent\Factory\Service\TypeServiceFactory::class,
             'MdjamanEvent\Service\Tag'              => \MdjamanEvent\Factory\Service\TagServiceFactory::class,
 
-            'Event\Repository\Event'                => \MdjamanEvent\Factory\Repository\EventRepositoryFactory::class,
-            'Event\Repository\Type'                 => \MdjamanEvent\Factory\Repository\TypeRepositoryFactory::class,
-            'Event\Repository\Tag'                  => \MdjamanEvent\Factory\Repository\TagRepositoryFactory::class,
+            'MdjamanEvent\Repository\Event'         => \MdjamanEvent\Factory\Repository\EventRepositoryFactory::class,
+            'MdjamanEvent\Repository\Type'          => \MdjamanEvent\Factory\Repository\TypeRepositoryFactory::class,
+            'MdjamanEvent\Repository\Tag'           => \MdjamanEvent\Factory\Repository\TagRepositoryFactory::class,
 
-            'Event\Filter\Event'                    => \MdjamanEvent\Factory\Filter\EventFilterFactory::class,
+            'MdjamanEvent\Filter\Event'             => \MdjamanEvent\Factory\Filter\EventFilterFactory::class,
 
             'MdjamanEventAdmin\Form\Event'          => \MdjamanEventAdmin\Factory\Form\EventFormFactory::class,
         ),

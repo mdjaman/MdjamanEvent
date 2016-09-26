@@ -143,7 +143,7 @@ class TypeController extends AbstractActionController
 
         $id = $this->params()->fromRoute('id', 0);
         if ($id === 0) {
-            return $this->forward()->dispatch('Event\Controller\Type', ['action' => 'index']);
+            return $this->forward()->dispatch('MdjamanEvent\Controller\Type', ['action' => 'index']);
         }
 
         $service = $this->getTypeService();
@@ -170,7 +170,7 @@ class TypeController extends AbstractActionController
             }
 
             $this->flashMessenger()->addMessage(_('Type d\'évènement introuvable'));
-            return $this->forward()->dispatch('Event\Controller\Type', ['action' => 'index']);
+            return $this->forward()->dispatch('MdjamanEvent\Controller\Type', ['action' => 'index']);
         }
 
         if ($request->isXmlHttpRequest()) {

@@ -45,7 +45,7 @@ class UploadControllerFactory implements FactoryInterface
     public function createService(ServiceLocatorInterface $controllers)
     {
         $services = $controllers->getServiceLocator();
-        $eventService = $services->get('Event\Service\Event');
+        $eventService = $services->get('MdjamanEvent\Service\Event');
         $form = $services->get('Form\Upload');
         
         $controller = new UploadController();
