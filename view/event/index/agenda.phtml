@@ -1,0 +1,115 @@
+<?php
+
+/**
+ * This file is part of the Inventory project
+ * Copyright (c) 2016
+ * @author Marcel Djaman <marceldjaman@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+$title = $this->translate('Evènements');
+
+$style = <<<HTML
+#loading {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+HTML;
+
+$this->headLink()
+     ->appendStylesheet($this->basePath() . '/bower_components/fullcalendar/dist/fullcalendar.min.css');
+
+$this->headStyle()->appendStyle($style);
+?>
+
+<section class="content-header">
+    <h1>
+        <?php echo $title; ?>
+        <small><?php echo $this->translate('Agenda') ?></small>
+    </h1>
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <!-- row -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title"><?php echo $this->translate('Les évènements') ?></h3>
+                    <p><a href="<?php echo $this->url('event') ?>"><i class="fa fa-sort-amount-desc"></i> <?php echo $this->translate('Basculer vers visuel chronologique') ?></a></p>
+                </div>
+                <div class="box-body">
+                    <div id="loading"><?php echo $this->translate('Chargement...') ?></div>
+                    <div id="calendar"></div>
+                </div>
+            </div>
+        </div>
+        <!-- /.col -->
+    </div>
+</section>
+
+<?php
+$script = <<<SCRIPT
+$(document).ready(function(e) {
+    $('#calendar').fullCalendar({
+        header: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'month,agendaWeek,agendaDay'
+        },
+        editable: false,
+        eventLimit: true, // allow "more" link when too many events
+        events: {
+            url: window.location.href,
+            startParam: 'startDate',
+            endParam: 'endDate',
+            success: function(doc) {
+                var data = doc.data;
+                var events = [];
+                data.forEach(function (item) {
+                    var evt = {
+                        title: item.name,
+                        start: item.startDate,
+                        details: item.details,
+                        address: item.address
+                    };
+                    if (typeof item.endDate != 'undefined') {
+                        evt.end = item.endDate;
+                    }
+                    events.push(evt);
+                });
+
+                return events;
+            },
+            error: function() {
+                utils.launchNotification('Erreur', 'Impossible de joindre le serveur', 'error');
+            }
+        },
+        eventClick: function(calEvent, jsEvent, view) {
+            var html = '<p>' + (typeof calEvent.details != 'undefined' ? calEvent.details : '<em>Aucune description</em>') + '</p>';
+            html += '<p>Adresse: ' + (typeof calEvent.address != 'undefined' ? calEvent.address : '<em>Aucune adresse</em>') + '</p>';
+            utils.launchModal(html, calEvent.title);
+
+            // opens events in a popup window
+            //window.open(event.url, 'gcalevent', 'width=700,height=600');
+            //return false;
+
+            // change the border color just for fun
+            $(this).css('border-color', 'red');
+        },
+        loading: function(bool) {
+            $('#loading').toggle(bool);
+        }
+    });
+});
+SCRIPT;
+
+$this->inlineScript()
+    ->appendFile($this->basePath() . '/bower_components/fullcalendar/dist/fullcalendar.min.js')
+    ->appendFile($this->basePath() . '/bower_components/fullcalendar/dist/lang/fr.js')
+    ->appendScript($script);

@@ -1,0 +1,167 @@
+<?php
+/**
+ * This file is part of FDFP project.
+ * @author Marcel Djaman <marceldjaman@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+$title = $this->translate('Ajouter un évènement');
+$this->headTitle($title);
+
+$form = $this->form;
+$sFormLayout = 'horizontal';
+
+$this->headLink()->appendStylesheet($this->basePath() . '/bower_components/ckeditor/skins/kama/editor.css');
+$this->inlineScript()->appendFile($this->basePath('bower_components/ckeditor/ckeditor.js'));
+
+$this->headLink()->appendStylesheet($this->basePath() . '/bower_components/blueimp-file-upload/css/jquery.fileupload.css');
+$this->headScript()->appendFile($this->basePath() . '/bower_components/blueimp-file-upload/js/vendor/jquery.ui.widget.js');
+$this->headScript()->appendFile($this->basePath() . '/bower_components/blueimp-load-image/js/load-image.all.min.js');
+$this->headScript()->appendFile($this->basePath() . '/bower_components/blueimp-canvas-to-blob/js/canvas-to-blob.min.js');
+$this->headScript()->appendFile($this->basePath() . '/bower_components/blueimp-file-upload/js/jquery.iframe-transport.js');
+$this->headScript()->appendFile($this->basePath() . '/bower_components/blueimp-file-upload/js/jquery.fileupload.js');
+$this->headScript()->appendFile($this->basePath() . '/bower_components/blueimp-file-upload/js/jquery.fileupload-process.js');
+$this->headScript()->appendFile($this->basePath() . '/bower_components/blueimp-file-upload/js/jquery.fileupload-image.js');
+$this->headScript()->appendFile($this->basePath() . '/bower_components/blueimp-file-upload/js/jquery.fileupload-validate.js');
+
+$script = <<<EOT
+var url = '{$this->url('upload', [], ['query' => ['type' => 'event']])}',
+uploadButton = $('<button/>')
+.addClass('btn btn-primary')
+.prop('disabled', true)
+.text('Processing...')
+.on('click', function (e) {
+    e.preventDefault();
+    var that = $(this),
+    data = that.data();
+    that
+        .off('click')
+        .text('Abort')
+        .on('click', function () {
+            that.remove();
+            data.abort();
+        });
+    data.submit().always(function () {
+        that.remove();
+    });
+});
+
+$('#fileupload').fileupload({
+    url: url,
+    dataType: 'json',
+    autoUpload: false,
+    maxFileSize: 5000000, // 5 MB
+    disableImageResize: /Android(?!.*Chrome)|Opera/.test(window.navigator.userAgent),
+    previewMaxWidth: 100,
+    previewMaxHeight: 100,
+    previewCrop: true
+}).on('fileuploadadd', function (e, data) {
+    data.context = $('<div/>').appendTo('#files');
+    $.each(data.files, function (index, file) {
+        var node = $('<p/>').append($('<span/>').text(file.name));
+        if (!index) {
+            node.append('<br>')
+                .append(uploadButton.clone(true).data(data));
+        }
+        node.appendTo(data.context);
+    });
+}).on('fileuploadprocessalways', function (e, data) {
+    var index = data.index,
+    file = data.files[index],
+    node = $(data.context.children()[index]);
+    if (file.preview) {
+        node.prepend('<br>')
+            .prepend(file.preview);
+    }
+    if (file.error) {
+        node.append('<br>')
+            .append($('<span class="text-danger"/>').text(file.error));
+    }
+    if (index + 1 === data.files.length) {
+        data.context.find('button')
+            .text('Upload')
+            .prop('disabled', !!data.files.error);
+    }
+}).on('fileuploadprogressall', function (e, data) {
+    var progress = parseInt(data.loaded / data.total * 100, 10);
+    $('#progress .progress-bar').css('width', progress + '%');
+}).on('fileuploaddone', function (e, data) {
+    $.each(data.result, function (index, file) {
+        if (file.url) {
+            var link = $('<a>')
+                    .attr('target', '_blank')
+                    .prop('href', file.url);
+            $(data.context.children()[index])
+                    .wrap(link);
+            $("input#img").val(file.url);
+        } else if (file.error) {
+            var error = $('<span class="text-danger"/>').text(file.error);
+            $(data.context.children()[index])
+                    .append('<br>')
+                    .append(error);
+        }
+    });
+}).on('fileuploadfail', function (e, data) {
+    $.each(data.files, function (index) {
+        var error = $('<span class="text-danger"/>').text('File upload failed.');
+        $(data.context.children()[index])
+                .append('<br>')
+                .append(error);
+    });
+}).prop('disabled', !$.support.fileInput)
+        .parent().addClass($.support.fileInput ? undefined : 'disabled');
+EOT;
+$this->inlineScript()
+    ->appendScript($script);
+?>
+
+<section class="content-header">
+    <h1>
+        <?php echo $title ?>
+        <small></small>
+    </h1>
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title"><?php echo $this->translate('Ajouter un évènement') ?></h3>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-xs-9">
+                            <?php
+                            $form->prepare();
+                            $form->setAttribute('action', $this->url('zfcadmin/event/event/add'));
+                            $form->setAttribute('method', 'post');
+                            
+                            echo $this->form(null, $sFormLayout)->openTag($form);
+                            echo $this->formRow($form->get('name'));
+                            echo $this->formRow($form->get('details'));
+                            echo $this->formRow($form->get('type'));
+                            echo $this->formRow($form->get('tags'));
+                            echo $this->formRow($form->get('startDate'));
+                            echo $this->formRow($form->get('endDate'));
+                            echo $this->formRow($form->get('address'));
+                            echo $this->formHidden($form->get('img'));
+                            ?>
+                            
+                            <?php echo $this->partial('event-admin/_partials/fileupload.phtml'); ?>
+                            <?php
+                            echo $this->formRow($form->get('active'));
+                            echo $this->formRow($form->get('feature'));
+                            echo $this->formRow($form->get('cmtopen'));
+                            echo $this->formRow($form->get('submit'));
+                            echo $this->form()->closeTag();
+                            ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

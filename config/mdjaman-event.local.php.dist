@@ -1,0 +1,64 @@
+<?php
+
+/**
+ * This file is part of FDFP project.
+ * @author Marcel Djaman <marceldjaman@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+/**
+ * InventoryEvent Configuration
+ *
+ * If you have a ./config/autoload/ directory set up for your project, you can
+ * drop this config file in it and change the values as you wish.
+ */
+
+$settings = array(
+    'event_entity_class' => 'Event\Entity\Event',
+    'type_entity_class' => 'Event\Entity\Type',
+    'tag_entity_class' => 'Event\Entity\Tag',
+    'recent_listing_limit' => 20,
+    'type_listing_limit' => 20,
+    'archive_listing_limit' => 20,
+    'feed_listing_limit' => 20,
+    'admin_listing_limit' => 20,
+    'sitemap' => array(
+        'changefreq' => '',
+        'priority' => '',
+    ),
+    'feed_generator' => array(
+        'name' => 'My Event',
+        'version' => 'v0.1.0',
+        'uri' => 'http://domain.tld/',
+    ),
+    'feed_settings' => array(
+        'title' => 'My website events',
+        'description' => 'Flux RSS Site',
+    ),
+    'social_sharing' => array(
+        'provider' => 'addthis',
+        'id' => 'ra-xxxxxxxx',
+        'networks' => array(
+            'facebook',
+            'twitter',
+            'google_plus',
+            'linkedin',
+        ),
+        'analytics' => array(
+            'service' => 'google',
+            'social' => true,
+            'code' => 'UA-xxxxxxxx-1',
+        ),
+    ),
+    'comment_service' => array(
+        'provider' => 'disqus',
+        'identifier' => 'xxxxxx',
+        'shortname' => 'xxxxxxx',
+    ),
+);
+
+return array(
+    'mdjaman_event' => $settings,
+);

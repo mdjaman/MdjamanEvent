@@ -1,0 +1,80 @@
+<?php
+
+/**
+ * This file is part of the Inventory project
+ * Copyright (c) 2016
+ * @author Marcel Djaman <marceldjaman@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+$title = $this->translate('Evènements');
+$events = $this->event;
+?>
+
+<section class="content-header">
+    <h1>
+        <?php echo $title; ?>
+        <small><?php echo $this->translate('Timeline') ?></small>
+    </h1>
+    <p><a href="<?php echo $this->url('event', [], ['query' => [
+            'agenda' => 1
+        ]]) ?>"><i class="fa fa-calendar-check-o"></i> <?php echo $this->translate('Basculer vers agenda') ?></a></p>
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <!-- row -->
+    <div class="row">
+        <div class="col-md-12">
+            <!-- The time line -->
+            <ul class="timeline">
+                <!-- timeline time label -->
+                <li class="time-label">
+                  <span class="bg-red">10 Feb. 2014</span>
+                </li>
+                <!-- /.timeline-label -->
+                <!-- timeline item -->
+                <li>
+                    <i class="fa fa-envelope bg-blue"></i>
+                    <div class="timeline-item">
+                        <span class="time"><i class="fa fa-clock-o"></i> 12:05</span>
+
+                        <h3 class="timeline-header"><a href="#">Support Team</a> sent you an email</h3>
+
+                        <div class="timeline-body">
+                            Etsy doostang zoodles disqus groupon greplin oooj voxy zoodles,
+                            weebly ning heekya handango imeem plugg dopplr jibjab, movity
+                            jajah plickers sifteo edmodo ifttt zimbra. Babblely odeo kaboodle
+                            quora plaxo ideeli hulu weebly balihoo...
+                        </div>
+                        <div class="timeline-footer">
+                            <a class="btn btn-primary btn-xs">Read more</a>
+                            <a class="btn btn-danger btn-xs">Delete</a>
+                        </div>
+                    </div>
+                </li>
+                <?php foreach ($events as $item) : ?>
+                <?php /* @var \Event\Entity\Event $item */ ?>
+                <li>
+                    <i class="fa fa-envelope bg-blue"></i>
+                    <div class="timeline-item">
+                        <span class="time"><i class="fa fa-clock-o"></i> <?php echo $item->getStartDate()->format('H:i') ?></span>
+
+                        <h3 class="timeline-header"><a href="#"><?php echo $item->getName() ?></a></h3>
+
+                        <div class="timeline-body"><?php echo $item->getDetails() ?></div>
+                        <div class="timeline-footer">
+                            <a class="btn btn-primary btn-xs">Read more</a>
+                            <a class="btn btn-danger btn-xs">Delete</a>
+                        </div>
+                    </div>
+                </li>
+                <!-- END timeline item -->
+                <?php endforeach; ?>
+            </ul>
+        </div>
+        <!-- /.col -->
+    </div>
+</section>

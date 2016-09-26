@@ -1,0 +1,654 @@
+<?php
+/**
+ * This file is part of FDFP project.
+ * @author Marcel Djaman <marceldjaman@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+$title = $this->translate('Evènements');
+$this->headTitle($title);
+
+$this->headScript()->appendFile($this->basePath() . '/bower_components/blueimp-file-upload/js/vendor/jquery.ui.widget.js');
+$this->headScript()->appendFile($this->basePath() . '/bower_components/blueimp-load-image/js/load-image.all.min.js');
+$this->headScript()->appendFile($this->basePath() . '/bower_components/blueimp-canvas-to-blob/js/canvas-to-blob.min.js');
+$this->headScript()->appendFile($this->basePath() . '/bower_components/blueimp-file-upload/js/jquery.iframe-transport.js');
+$this->headScript()->appendFile($this->basePath() . '/bower_components/blueimp-file-upload/js/jquery.fileupload.js');
+$this->headScript()->appendFile($this->basePath() . '/bower_components/blueimp-file-upload/js/jquery.fileupload-process.js');
+$this->headScript()->appendFile($this->basePath() . '/bower_components/blueimp-file-upload/js/jquery.fileupload-image.js');
+$this->headScript()->appendFile($this->basePath() . '/bower_components/blueimp-file-upload/js/jquery.fileupload-validate.js');
+
+$this->headLink()->appendStylesheet($this->basePath() . '/bower_components/ckeditor/skins/kama/editor.css');
+$this->inlineScript()->appendFile($this->basePath() . '/bower_components/ckeditor/ckeditor.js');
+
+$this->headLink()->appendStylesheet($this->basePath() . '/bower_components/ckeditor/skins/kama/editor.css');
+$this->inlineScript()->appendFile($this->basePath('bower_components/ckeditor/ckeditor.js'));
+$script = <<<EOT
+function triggerFileUploadCtn() {    
+    var url = '{$this->url('zfcadmin/event/upload', [])}',
+            uploadButton = $('<button/>')
+            .addClass('btn btn-primary')
+            .prop('disabled', true)
+            .text('Processing...')
+            .on('click', function (e) {
+                e.preventDefault();
+                var that = $(this),
+                data = that.data();
+                that
+                    .off('click')
+                    .text('Abort')
+                    .on('click', function () {
+                        that.remove();
+                        data.abort();
+                    });
+                data.submit().always(function () {
+                    that.remove();
+                });
+            });
+    
+    $('#fileupload').fileupload({
+        url: url,
+        dataType: 'json',
+        autoUpload: false,
+        maxFileSize: 5000000, // 5 MB
+        disableImageResize: /Android(?!.*Chrome)|Opera/.test(window.navigator.userAgent),
+        previewMaxWidth: 100,
+        previewMaxHeight: 100,
+        previewCrop: true
+    }).on('fileuploadadd', function (e, data) {
+        data.context = $('<div/>').appendTo('#files');
+        $.each(data.files, function (index, file) {
+            var node = $('<p/>').append($('<span/>').text(file.name));
+            if (!index) {
+                node
+                    .append('<br>')
+                    .append(uploadButton.clone(true).data(data));
+            }
+            node.appendTo(data.context);
+        });
+    }).on('fileuploadprocessalways', function (e, data) {
+        var index = data.index,
+        file = data.files[index],
+        node = $(data.context.children()[index]);
+        if (file.preview) {
+            node
+                .prepend('<br>')
+                .prepend(file.preview);
+        }
+        if (file.error) {
+            node
+                .append('<br>')
+                .append($('<span class="text-danger"/>').text(file.error));
+        }
+        if (index + 1 === data.files.length) {
+            data.context.find('button')
+                .text('Upload')
+                .prop('disabled', !!data.files.error);
+        }
+    }).on('fileuploadprogressall', function (e, data) {
+        var progress = parseInt(data.loaded / data.total * 100, 10);
+        $('#progress .progress-bar').css('width', progress + '%');
+    }).on('fileuploaddone', function (e, data) {
+        $.each(data.result, function (index, file) {
+            if (file.url) {
+                var link = $('<a>')
+                        .attr('target', '_blank')
+                        .prop('href', file.url);
+                $(data.context.children()[index])
+                        .wrap(link);
+                $("input#img").val(file.url);
+                utils.launchNotification('Téléchargement', 'Image téléchargée avec succès', 'success')
+            } else if (file.error) {
+                var error = $('<span class="text-danger"/>').text(file.error);
+                $(data.context.children()[index])
+                        .append('<br>')
+                        .append(error);
+            }
+        });
+    }).on('fileuploadfail', function (e, data) {
+        $.each(data.files, function (index) {
+            var error = $('<span class="text-danger"/>').text('File upload failed.');
+            $(data.context.children()[index])
+                    .append('<br>')
+                    .append(error);
+        });
+    }).prop('disabled', !$.support.fileInput)
+            .parent().addClass($.support.fileInput ? undefined : 'disabled');
+    
+}
+EOT;
+
+$editorScript = <<<SCRIPT
+if ( CKEDITOR.env.ie && CKEDITOR.env.version < 9 )
+	CKEDITOR.tools.enableHtml5Elements( document );
+
+// The trick to keep the editor in the sample quite small
+// unless user specified own height.
+CKEDITOR.config.height = 150;
+CKEDITOR.config.width = 'auto';
+
+var initEditor = ( function() {
+var wysiwygareaAvailable = isWysiwygareaAvailable(),
+        isBBCodeBuiltIn = !!CKEDITOR.plugins.get( 'bbcode' );
+
+return function() {
+    var editorElement = CKEDITOR.document.getById( 'details' );
+
+    if (isBBCodeBuiltIn) {
+        editorElement.setHtml('Entrez le texte ici!');
+    }
+
+    // Depending on the wysiwygare plugin availability initialize classic or inline editor.
+    if ( wysiwygareaAvailable ) {
+        CKEDITOR.replace('details');
+    } else {
+        editorElement.setAttribute( 'contenteditable', 'true' );
+        CKEDITOR.inline('details' );
+
+        // TODO we can consider displaying some info box that
+        // without wysiwygarea the classic editor may not work.
+    }
+};
+
+function isWysiwygareaAvailable() {
+    // If in development mode, then the wysiwygarea must be available.
+    // Split REV into two strings so builder does not replace it :D.
+    if ( CKEDITOR.revision == ( '%RE' + 'V%' ) ) {
+        return true;
+    }
+
+    return !!CKEDITOR.plugins.get( 'wysiwygarea' );
+}
+})();
+SCRIPT;
+$this->inlineScript()->appendScript($editorScript);
+$this->inlineScript()->appendScript($script);
+?>
+
+<section class="content-header">
+    <div class="btn-group btn-xs pull-right">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <?php echo $this->translate('Nouveau') ?> <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="#" id="btn-add"><?php echo $this->translate('Simple') ?></a></li>
+            <li><a href="<?php echo $this->url('zfcadmin/event/event/add') ?>"><?php echo $this->translate('Pus d\'options') ?></a></li>
+        </ul>
+    </div>
+    <h1>
+        <?php echo $title ?>
+    </h1>
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title"><?php echo $this->translate('Liste des évènements') ?></h3>
+                </div>
+                <div class="box-body">
+                    <div class="alert filter-box alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                        <h4>
+                            <i class="icon fa fa-filter"></i> <?php echo $this->translate('Filtre') ?>
+                            <span class="filters-placeholder"></span>
+                        </h4>
+                        <form class="form-inline form-filter" action="<?php echo $this->url('zfcadmin/event/event') ?>">
+                            <div class="form-group">
+                                <label for="type"><?php echo $this->translate('Type') ?></label>
+                                <select name="type" class="form-control chzn-select" id="type"
+                                        data-url="<?php echo $this->url('zfcadmin/event/type') ?>"
+                                        data-placeholder="<?php echo $this->translate('Type') ?>">
+                                    <option value=""><?php echo $this->translate('-- Type --') ?></option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="active"><?php echo $this->translate('Etat') ?></label>
+                                    <select name="active" class="form-control chzn-select" id="active"
+                                            data-placeholder="<?php echo $this->translate('Etat') ?>">
+                                    <option value=""><?php echo $this->translate('-- Etat --') ?></option>
+                                    <option
+                                        value="<?php echo \Event\Definitions::STATUS_ACTIVE ?>"><?php echo $this->translate('Actif') ?></option>
+                                    <option
+                                        value="<?php echo \Event\Definitions::STATUS_INACTIVE ?>"><?php echo $this->translate('Inactif') ?></option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="feature"><?php echo $this->translate('Mis en avant') ?></label>
+                                <select name="feature" class="form-control chzn-select" id="feature"
+                                        data-placeholder="<?php echo $this->translate('Mis en avant') ?>">
+                                    <option value=""><?php echo $this->translate('-- En avant --') ?></option>
+                                    <option
+                                        value="<?php echo \Event\Definitions::STATUS_ACTIVE ?>"><?php echo $this->translate('Oui') ?></option>
+                                    <option
+                                        value="<?php echo \Event\Definitions::STATUS_INACTIVE ?>"><?php echo $this->translate('Non') ?></option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="startDate"><?php echo $this->translate('Date début') ?></label>
+                                <input type="text" name="startDate" class="form-control datepicker" id="startDate"
+                                       data-placeholder="<?php echo $this->translate('Date de début') ?>">
+                            </div>
+
+                            <button type="submit"
+                                    class="btn btn-sm btn-default"><?php echo $this->translate('Appliquer') ?></button>
+                        </form>
+                    </div>
+
+                    <table id="document-table" class="table table-bordered table-striped">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script type="text/html" id="form-template">
+    <form id="form-entity" method="post">
+        <div class="form-group">
+            <label for="name"><?php echo $this->translate('Titre') ?></label>
+            <input type="text" name="name" class="form-control" placeholder="<?php echo $this->translate('Titre') ?>" id="name">
+        </div>
+        <div class="form-group">
+            <label for="details"><?php echo $this->translate('Description') ?></label>
+            <textarea name="details" class="form-control ckeditor" placeholder="<?php echo $this->translate('Description') ?>" id="details"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="startDate"><?php echo $this->translate('Date début') ?></label>
+            <input type="text" name="startDate" class="form-control datepicker" placeholder="<?php echo $this->translate('Date début') ?>" id="startDate">
+        </div>
+        <div class="form-group">
+            <label for="type"><?php echo $this->translate('Type') ?></label>
+            <select name="type" class="form-control chzn-select" id="type" data-url="<?php echo $this->url('zfcadmin/event/type') ?>"></select>
+        </div>
+
+        <!--<span class="btn btn-success fileinput-button">
+            <i class="glyphicon glyphicon-plus"></i>
+            <span><?php echo $this->translate('Ajouter fichier') ?></span>
+            <input type="file" name="file[]" id="fileupload">
+        </span>
+
+        <div class="progress" id="progress">
+            <div class="progress-bar progress-bar-success"></div>
+        </div>
+
+        <div class="files" id="files"></div>
+
+        <input type="hidden" name="img" id="img">-->
+
+        <div class="form-group">
+            <div class="radio">
+                <label>
+                    <input type="radio" name="feature" id="feature1" value="1">
+                    <?php echo $this->translate('Mettre en avant') ?>
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                    <input type="radio" name="feature" id="feature0" value="0" checked>
+                    <?php echo $this->translate('Ne pas mettre en avant') ?>
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="radio">
+                <label>
+                    <input type="radio" name="active" id="active1" value="1" checked>
+                    <?php echo $this->translate('Activer') ?>
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                    <input type="radio" name="active" id="active0" value="0">
+                    <?php echo $this->translate('Désactiver') ?>
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="radio">
+                <label>
+                    <input type="radio" name="cmtopen" id="cmtopen1" value="1">
+                    <?php echo $this->translate('Autoriser commentaires') ?>
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                    <input type="radio" name="cmtopen" id="cmtopen0" value="0" checked>
+                    <?php echo $this->translate('Fermer les commentaires') ?>
+                </label>
+            </div>
+        </div>
+
+        <button class="btn btn-primary" type="submit"><?php echo $this->translate('Enregistrer') ?></button>
+    </form>
+</script>
+
+<script type="text/html" id="form-delete-template">
+    <form role="form" id="delete-entity">
+        <?php echo $this->translate('Etes-vous sûr de vouloir supprimer ?') ?>
+        <button type="button" class="btn btn-danger" id="confirmModalYes"><?php echo $this->translate('Oui') ?></button>&nbsp;
+        <button type="button" class="btn btn-primary" id="confirmModalNo"><?php echo $this->translate('Non') ?></button>
+    </form>
+</script>
+
+<script>
+var cols = [{
+    field: 'id', 
+    title: 'Id'
+}, {
+    field: 'name',
+    title: 'Titre'
+}, {
+    field: 'type',
+    title: 'Type',
+    formatter: typeFormatter
+}, {
+    field: 'details',
+    title: 'Contenu',
+    formatter: contentFormatter
+}, {
+    field: 'startDate',
+    title: 'Date début',
+    formatter: dateFormatter
+}, {
+    field: 'endDate',
+    title: 'Date fin',
+    formatter: dateFormatter,
+    visible: false
+}, {
+    field: 'address',
+    title: 'Lieu',
+    visible: false
+}, {
+    field: 'tags',
+    title: 'Mots-clés',
+    visible: false,
+    formatter: tagsFormatter
+}, {
+    field: 'img',
+    title: 'Image',
+    formatter: pictureFormatter
+}, {
+    field: 'active',
+    title: 'Actif',
+    formatter: booleanFormatter
+}, {
+    field: 'feature',
+    title: 'En avant',
+    visible: false,
+    formatter: booleanFormatter
+}, {
+    field: 'cmtopen',
+    title: 'Autoriser commentaires',
+    visible: false,
+    formatter: booleanFormatter
+}, {
+    field: 'created_at',
+    title: 'Date création'
+}, {
+    field: '',
+    title: '',
+    formatter: eventActionFormatter
+}];
+
+function contentFormatter(value) {
+    var unescaped = _.unescape(value);
+    var stripTags = unescaped.replace(/(<([^>]+)>)/ig,"");
+    var html = $('<div />', {
+        class: 'read-more',
+        html: stripTags
+    });
+    return html.prop('outerHTML');
+}
+
+function booleanFormatter(value) {
+    if (value) {
+        return 'oui';
+    }
+    
+    return 'non';
+}
+
+function dateFormatter(value) {
+    if (moment(value, moment.ISO_8601).isValid()) {
+        return moment(value).format('DD-MM-YYYY');
+    }
+    
+    return '_';
+}
+
+function typeFormatter(value) {
+    if (typeof value === 'object') {
+        return value.name;
+    }
+    return '_';
+}
+
+function pictureFormatter(picture, row) {
+    if (typeof picture === 'undefined' || picture === '') {
+        return '';
+    }
+
+    var title = row.name;
+    var thumb = utils.getPictureThumbUrl(picture);
+    return '<a href="' + picture + '" rel="colorbox" title="' + title + '"><img src="' + thumb + '"></a>';
+}
+
+function tagsFormatter(value, row) {
+    var html = '_';
+    if (typeof value === 'object') {
+        html = '';
+        value.forEach(function(item) {
+            html += '<span class="label label-primary">' + item.name + '</span><br>';
+        });
+    }
+    return html;
+}
+
+function eventActionFormatter(value, row) {
+    var rowId = row.id;
+    var alias = row.alias;
+    var eventUrl = '/event/' + alias + '?fromAdmin=1';
+
+    var html = '<div class="dropdown pull-right">' +
+        '<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">' +
+        '<i class="fa fa-list"></i> ' +
+        '<span class="caret"></span>' +
+        '</button>' +
+        '<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">\n' +
+        '<li><a href="' + eventUrl + '" target="_blank">Prévisualiser</a></li>\n' +
+        '</ul>' +
+        '</div>';
+
+    return html;
+}
+
+$(document).ready(function () {
+    var typeList = [];
+    var $formTpl = $($("#form-template").html());
+    var $typeElm = $formTpl.find('#type');
+
+    var uri = new URI(window.location.href);
+    var dataUrl = uri.pathname() + uri.search();
+    var bootstrapTableCls = new MyBootstrapTable($("#document-table"), dataUrl, cols);
+    bootstrapTableCls.init();
+
+    var activeQs = uri.query(true).active;
+    if (typeof activeQs !== 'undefined') {
+        $(".form-filter #active").find('option[value="' + activeQs + '"]').prop('selected', true);
+    }
+
+    var featureQs = uri.query(true).feature;
+    if (typeof featureQs !== 'undefined') {
+        $(".form-filter #feature").find('option[value="' + featureQs + '"]').prop('selected', true);
+    }
+
+    var startDateQs = uri.query(true).startDate;
+    if (typeof startDateQs !== 'undefined') {
+        $(".form-filter #startDate").val(startDateQs);
+    }
+
+    $.ajax({
+        type: "GET",
+        url: $typeElm.data('url'),
+        cache: false,
+        success: function (response) {
+             typeList = response.data;
+             typeCb(typeList, "#type");
+        },
+        error: function (response) {
+            utils.launchNotification("Erreur", "Impossible de joindre le serveur", "error");
+        }
+    });
+
+    function typeCb(data, selector) {
+        var $selector;
+        if (selector && (selector instanceof jQuery || selector.constructor.prototype.jquery)) {
+            $selector = selector;
+        } else {
+            $selector = $(selector);
+        }
+
+        $.each(data, function (i, val) {
+            $selector.append(
+                $('<option>').text(val.name).val(val.id)
+            );
+        });
+        var typeQs = uri.query(true).type;
+        if (typeof typeQs !== 'undefined') {
+            $selector.find('option[value="' + typeQs + '"]').prop('selected', true);
+        }
+
+        $selector.trigger("chosen:updated");
+        utils.filteredInput();
+    }
+
+    $('#btn-add').click(function (e) {
+        e.preventDefault();
+        utils.launchModal($("#form-template").html(), 'Ajouter évènement');
+        
+        initEditor();
+        typeCb(typeList, "form#form-entity #type");
+        
+        $("#form-entity").attr("action", "<?php echo $this->url("zfcadmin/event/event/add"); ?>");
+        $("#form-entity").data("method-action", "add");
+    });
+    
+    $(document).on('click', "a#btn-edit", function () {
+        var id = $(this).parents("tr").data("id");
+        var rowData = bootstrapTableCls.getRow(id);
+        
+        utils.launchModal($("#form-template").html(), 'Evènement "' + rowData.name + '"');
+        initEditor();
+        typeCb(typeList, "form#form-entity #type");
+        
+        $.each(rowData, function (key, value) {
+            var selector = "#form-entity #" + key;
+            switch (key) {
+                case 'details':
+                    $(selector).val(_.unescape(value));
+                    break;
+                case 'type':
+                    $(selector).val(value.id);
+                    $(selector).trigger("chosen:updated");
+                    break;
+                case 'startDate':
+                case 'endDate':
+                    if (moment(value, moment.ISO_8601).isValid()) {
+                        var formatted = moment(value).format('DD-MM-YYYY')
+                        $(selector).val(formatted);
+                    }
+                    break;
+                case 'active':
+                case 'feature':
+                    $("#form-entity input[name='" + key + "']").filter(function () {
+                        if ($(this).val() == +value) {
+                            return true;
+                        }
+                    }).prop("checked", true);
+                    break;
+                default:
+                    $(selector).val(value);
+            }
+        });
+        
+
+        $("#form-entity").attr("action", "<?php echo $this->basePath("admin/event/event/"); ?>" + id + "/_edit");
+        $("#form-entity").data("method-action", "edit");
+    });
+    
+    $(document).on('click', "a#btn-delete", function () {
+        var id = $(this).parents('tr').data("id");
+        var rowData = bootstrapTableCls.getRow(id);
+
+        utils.launchModal($("#form-delete-template").html(), 'Evènement "' + rowData.name + '"');
+
+        $("#confirmModalNo").on('click', function () {
+            $('#modal-container').modal("hide");
+        });
+        $("#confirmModalYes").on('click', function (e) {
+            $.ajax({
+                type: "POST",
+                url: "<?php echo $this->basePath("admin/event/event/"); ?>" + id + "/_delete",
+                cache: false,
+                dataType: "json",
+                data: {
+                    id: id, 
+                    delete: 'yes'
+                },
+                success: function (response) {
+                    if (response.code === 1) {
+                        bootstrapTableCls.removeRow(id);
+                        utils.launchNotification('Suppression', response.msg, 'danger');
+                    }
+                },
+                error: function (error) {
+                    utils.launchNotification("Erreur", "Impossible de supprimer", "error");
+                },
+                beforeSend: function () {
+                    $(".ajax-loader").show();
+                },
+                complete: function () {
+                    $(".ajax-loader").hide();
+                    $('#modal-container').modal("hide");
+                }
+            });
+            e.preventDefault();
+        });
+
+    });
+    
+    $(document).on('submit', '#form-entity', function (e) {
+        var $form = $(this);
+        $.ajax({
+            type: "POST",
+            url: $form.attr("action"),
+            cache: false,
+            dataType: "json",
+            data: $form.serialize(),
+            success: function (response) {
+                var methodAction = $form.data("method-action");
+                if (methodAction === 'add') {
+                    bootstrapTableCls.appendRow(response.data);
+                } else {
+                    bootstrapTableCls.editRow(response.data);
+                }
+                $('#modal-container').modal("hide");
+            },
+            error: function (reponse) {
+                utils.launchNotification("Erreur", "Impossible de joindre le serveur", "error");
+            },
+            beforeSend: function () {
+                $(".ajax-loader").show();
+            },
+            always: function () {
+                $(".ajax-loader").hide();
+            }
+        });
+        
+        e.preventDefault();
+    });
+});
+</script>

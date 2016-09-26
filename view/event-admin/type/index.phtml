@@ -1,0 +1,208 @@
+<?php
+/**
+ * This file is part of FDFP project.
+ * @author Marcel Djaman <marceldjaman@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+$title = $this->translate('Type');
+$this->headTitle($title);
+?>
+
+<section class="content-header">
+    <button class="btn btn-primary btn-xs pull-right" data-toggle="modal" id="btn-add">
+        <i class="fa fa-plus-square"></i>
+    </button>
+    <h1>
+        <?php echo $title ?>
+    </h1>
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title"><?php echo $this->translate('Liste des types') ?></h3>
+                </div>
+                <div class="box-body">
+                    <table id="document-table" class="table table-bordered table-striped">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--modal bootstrap-->
+<script type="text/html" id="form-template">
+    <form id="form-entity" method="post">
+        <div class="form-group">
+            <label for="name"><?php echo $this->translate('Nom') ?></label>
+            <input name="name" class="form-control required" placeholder="<?php echo $this->translate('Nom') ?>" id="name" required>
+        </div>
+        <div class="form-group">
+            <label for="details"><?php echo $this->translate('Infos') ?></label>
+            <textarea name="details" class="form-control" placeholder="<?php echo $this->translate('Infos') ?>" id="details"></textarea>
+        </div>
+
+        <button class="btn btn-primary" type="submit"><?php echo $this->translate('Enregistrer') ?></button>
+    </form>
+</script>
+
+<script type="text/html" id="form-delete-template">
+    <form role="form" id="delete-entity">
+        <?php echo $this->translate('Etes-vous sûr de vouloir supprimer ?') ?>
+        <button type="button" class="btn btn-danger" id="confirmModalYes"><?php echo $this->translate('Oui') ?></button>&nbsp;
+        <button type="button" class="btn btn-primary" id="confirmModalNo"><?php echo $this->translate('Non') ?></button>
+    </form>
+</script>
+
+<script>
+var cols = [{
+    field: 'id',
+    title: 'Id'
+}, {
+    field: 'name',
+    title: 'Nom'
+}, {
+    field: 'details',
+    title: 'Infos'
+}, {
+    field: 'created_at',
+    title: 'Date création'
+}, {
+    field: '',
+    title: '',
+    formatter: actionFormatter
+}];
+
+function actionFormatter(value, row) {
+    var rowId = row.id;
+    var itemName = row.name;
+    var eventTypeUrl = '/admin/event/event?type=' + rowId;
+
+    var html = '<div class="dropdown pull-right">' +
+        '<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">' +
+        '<i class="fa fa-list"></i> ' +
+        '<span class="caret"></span>' +
+        '</button>' +
+        '<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">' +
+        '<li><a href="' + eventTypeUrl + '">Les évènements concernant le type ' + itemName + '</a></li>' +
+        '</ul>' +
+        '</div>';
+
+    return html;
+}
+
+$(document).ready(function () {
+    var $formTpl = $($("#form-template").html());
+
+    var uri = new URI(window.location.href);
+    var dataUrl = uri.pathname() + uri.search();
+    var bootstrapTableCls = new MyBootstrapTable($("#document-table"), dataUrl, cols);
+    bootstrapTableCls.init();
+
+    $('#btn-add').click(function (e) {
+        e.preventDefault();
+        utils.launchModal($("#form-template").html(), 'Ajouter une type');
+
+        $("#form-entity").attr("action", "<?php echo $this->url("zfcadmin/event/type/add"); ?>");
+        $("#form-entity").data("method-action", "add");
+    });
+    
+    $(document).on('click', "a#btn-edit", function () {
+        var id = $(this).parents("tr").data("id");
+        var rowData = bootstrapTableCls.getRow(id);
+        
+        utils.launchModal($("#form-template").html(), 'Type "' + rowData.name + '"');
+
+        $.each(rowData, function (key, value) {
+            var selector = "#form-entity #" + key;
+            $(selector).val(value);
+        });
+
+        $("#form-entity").attr("action", "<?php echo $this->basePath("admin/event/type/"); ?>" + id + "/_edit");
+        $("#form-entity").data("method-action", "edit");
+    });
+    
+    $(document).on('click', "a#btn-delete", function () {
+        var id = $(this).parents('tr').data("id");
+        var rowData = bootstrapTableCls.getRow(id);
+
+        utils.launchModal($("#form-delete-template").html(), 'Type "' + rowData.name + '"');
+
+        $("#confirmModalNo").on('click', function () {
+            $('#modal-container').modal("hide");
+        });
+        $("#confirmModalYes").on('click', function (e) {
+            $.ajax({
+                type: "POST",
+                url: "<?php echo $this->basePath("admin/event/type/"); ?>" + id + "/_delete",
+                cache: false,
+                dataType: "json",
+                data: {
+                    id: id, 
+                    delete: 'yes'
+                },
+                success: function (response) {
+                    if (response.code === 1) {
+                        bootstrapTableCls.removeRow(id);
+                        utils.launchNotification('Suppression', response.msg, 'danger');
+                    }
+                },
+                error: function (error) {
+                    utils.launchNotification('Erreur', 'Impossible de supprimer', 'error');
+                },
+                beforeSend: function () {
+                    $(".ajax-loader").show();
+                },
+                complete: function () {
+                    $(".ajax-loader").hide();
+                    $('#modal-container').modal("hide");
+                }
+            });
+            e.preventDefault();
+        });
+
+    });
+    
+    $(document).on('submit', '#form-entity', function (e) {
+        var $form = $(this);
+        $.ajax({
+            type: "POST",
+            url: $form.attr("action"),
+            cache: false,
+            dataType: "json",
+            data: $form.serialize(),
+            success: function (response) {
+                var data = response.data;
+                var methodAction = $form.data("method-action");
+                if (methodAction === 'add') {
+                    bootstrapTableCls.appendRow(data);
+                } else {
+                    bootstrapTableCls.editRow(data);
+                }
+
+                var klass = (response.code === 1) ? 'success' : 'error';
+                utils.launchNotification('Type', response.msg, klass);
+                $('#modal-container').modal("hide");
+            },
+            error: function (reponse) {
+                utils.launchNotification('Erreur', 'Impossible de joindre le serveur', 'error');
+                $form.find('button[type="submit"]').prop('disabled', false);
+            },
+            beforeSend: function () {
+                $(".ajax-loader").show();
+            },
+            always: function () {
+                $(".ajax-loader").hide();
+            }
+        });
+        
+        e.preventDefault();
+    });
+});
+</script>

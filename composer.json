@@ -1,0 +1,48 @@
+{
+    "name": "mdjaman/mdjaman-event",
+    "description": "Module that provides event functionality in zf2",
+    "type": "library",
+    "keywords": [
+        "zf2",
+        "zend",
+        "module",
+        "blog",
+        "cms"
+    ],
+    "authors": [
+        {
+            "name": "Marcel Djaman",
+            "email": "marceldjaman@gmail.com",
+            "homepage": "http://github.com/mdjaman"
+        }
+    ],
+    "homepage": "https://github.com/mdjaman/MdjamanEvent",
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.4",
+        "zendframework/zendframework": "2.3.*",
+        "doctrine/doctrine-orm-module": "0.*",
+        "gedmo/doctrine-extensions": "dev-master",
+        "sp/jms-serializer-module": "dev-master",
+        "zf-commons/zfc-admin": "dev-master",
+        "nikolaposa/zf-open-graph": "1.*",
+        "mdjaman/mdjaman-common": "dev-master"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "4.8.*",
+        "zendframework/zftool": "dev-master"
+    },
+    "suggest": {
+        "rwoverdijk/assetmanager": "If you want include asset from this module public folder. Otherwise, just add ./public/bower.json to your project public folder and install dependancies",
+        "neilime/zf2-twb-bundle": "If you want to add twitter bootstrap style to your zend form"
+    },
+    "autoload": {
+        "psr-0": {
+            "MdjamanEvent": "src/"
+        },
+        "classmap": [
+            "./Module.php"
+        ]
+    }
+}
