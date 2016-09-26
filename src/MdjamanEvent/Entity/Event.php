@@ -34,7 +34,7 @@ use MdjamanCommon\Traits\BlameableEntity;
 
 /**
  * @ORM\Table(name="event_event")
- * @ORM\Entity(repositoryClass="Event\Repository\EventRepository")
+ * @ORM\Entity(repositoryClass="MdjamanEvent\Repository\EventRepository")
  */
 class Event extends BaseEntity implements EventInterface
 {

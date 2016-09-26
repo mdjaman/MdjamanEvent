@@ -35,7 +35,7 @@ use MdjamanCommon\Traits\BlameableEntity;
  * Type
  *
  * @ORM\Table(name="event_type")
- * @ORM\Entity(repositoryClass="Event\Repository\TypeRepository")
+ * @ORM\Entity(repositoryClass="MdjamanEvent\Repository\TypeRepository")
  */
 class Type extends BaseEntity implements TypeInterface
 {

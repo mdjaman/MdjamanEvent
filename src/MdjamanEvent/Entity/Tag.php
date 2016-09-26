@@ -34,7 +34,7 @@ use MdjamanCommon\Entity\BaseEntity;
  * Tag
  *
  * @ORM\Table(name="event_tag")
- * @ORM\Entity(repositoryClass="Event\Repository\TagRepository")
+ * @ORM\Entity(repositoryClass="MdjamanEvent\Repository\TagRepository")
  */
 class Tag extends BaseEntity implements TagInterface
 {
