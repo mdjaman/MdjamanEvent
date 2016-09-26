@@ -1,44 +1,60 @@
 <?php
 /**
- * This file is part of FDFP project.
- * @author Marcel Djaman <marceldjaman@gmail.com>
+ * The MIT License (MIT)
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * Copyright (c) 2016 Marcel Djaman
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 return array(
     'service_manager' => array(
         'factories' => array(
-            'Event\Options\ModuleOptions'        => \Event\Factory\Options\ModuleOptionsFactory::class,
+            'Event\Options\ModuleOptions'        => \MdjamanEvent\Factory\Options\ModuleOptionsFactory::class,
 
-            'Event\Service\Event'                => \Event\Factory\Service\EventServiceFactory::class,
-            'Event\Service\Type'                 => \Event\Factory\Service\TypeServiceFactory::class,
-            'Event\Service\Tag'                  => \Event\Factory\Service\TagServiceFactory::class,
+            'Event\Service\Event'                => \MdjamanEvent\Factory\Service\EventServiceFactory::class,
+            'Event\Service\Type'                 => \MdjamanEvent\Factory\Service\TypeServiceFactory::class,
+            'Event\Service\Tag'                  => \MdjamanEvent\Factory\Service\TagServiceFactory::class,
 
-            'Event\Repository\Event'             => \Event\Factory\Repository\EventRepositoryFactory::class,
-            'Event\Repository\Type'              => \Event\Factory\Repository\TypeRepositoryFactory::class,
-            'Event\Repository\Tag'               => \Event\Factory\Repository\TagRepositoryFactory::class,
+            'Event\Repository\Event'             => \MdjamanEvent\Factory\Repository\EventRepositoryFactory::class,
+            'Event\Repository\Type'              => \MdjamanEvent\Factory\Repository\TypeRepositoryFactory::class,
+            'Event\Repository\Tag'               => \MdjamanEvent\Factory\Repository\TagRepositoryFactory::class,
 
-            'Event\Filter\Event'                 => \Event\Factory\Filter\EventFilterFactory::class,
+            'Event\Filter\Event'                 => \MdjamanEvent\Factory\Filter\EventFilterFactory::class,
 
-            'EventAdmin\Form\Event'              => \EventAdmin\Factory\Form\EventFormFactory::class,
+            'EventAdmin\Form\Event'              => \MdjamanEventAdmin\Factory\Form\EventFormFactory::class,
         ),
         'invokables' => array(
-            'Event\Filter\Type'                  => \Event\Filter\TypeFilter::class,
-            'Event\Filter\Tag'                   => \Event\Filter\TagFilter::class,
+            'Event\Filter\Type'                  => \MdjamanEvent\Filter\TypeFilter::class,
+            'Event\Filter\Tag'                   => \MdjamanEvent\Filter\TagFilter::class,
         )
     ),
 
     'controllers' => array(
         'factories' => array(
-            'Event\Controller\Event'                => \Event\Factory\Controller\EventControllerFactory::class,
-            'Event\Controller\Type'                 => \Event\Factory\Controller\TypeControllerFactory::class,
+            'Event\Controller\Event'                => \MdjamanEvent\Factory\Controller\EventControllerFactory::class,
+            'Event\Controller\Type'                 => \MdjamanEvent\Factory\Controller\TypeControllerFactory::class,
 
-            'EventAdmin\Controller\Event'           => \EventAdmin\Factory\Controller\EventControllerFactory::class,
-            'EventAdmin\Controller\Type'            => \EventAdmin\Factory\Controller\TypeControllerFactory::class,
-            'EventAdmin\Controller\Tag'             => \EventAdmin\Factory\Controller\TagControllerFactory::class,
-            'EventAdmin\Controller\Upload'          => \EventAdmin\Factory\Controller\UploadControllerFactory::class,
+            'EventAdmin\Controller\Event'           => \MdjamanEventAdmin\Factory\Controller\EventControllerFactory::class,
+            'EventAdmin\Controller\Type'            => \MdjamanEventAdmin\Factory\Controller\TypeControllerFactory::class,
+            'EventAdmin\Controller\Tag'             => \MdjamanEventAdmin\Factory\Controller\TagControllerFactory::class,
+            'EventAdmin\Controller\Upload'          => \MdjamanEventAdmin\Factory\Controller\UploadControllerFactory::class,
         ),
     ),
 
