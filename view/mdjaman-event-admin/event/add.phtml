@@ -1,10 +1,26 @@
 <?php
 /**
- * This file is part of FDFP project.
- * @author Marcel Djaman <marceldjaman@gmail.com>
+ * The MIT License (MIT)
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * Copyright (c) 2016 Marcel Djaman
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 $title = $this->translate('Ajouter un évènement');
@@ -27,7 +43,7 @@ $this->headScript()->appendFile($this->basePath() . '/bower_components/blueimp-f
 $this->headScript()->appendFile($this->basePath() . '/bower_components/blueimp-file-upload/js/jquery.fileupload-validate.js');
 
 $script = <<<EOT
-var url = '{$this->url('upload', [], ['query' => ['type' => 'event']])}',
+var url = '{$this->url('zfcadmin/event/upload', [], ['query' => ['type' => 'event']])}',
 uploadButton = $('<button/>')
 .addClass('btn btn-primary')
 .prop('disabled', true)
@@ -120,7 +136,6 @@ $this->inlineScript()
 <section class="content-header">
     <h1>
         <?php echo $title ?>
-        <small></small>
     </h1>
 </section>
 
@@ -150,7 +165,7 @@ $this->inlineScript()
                             echo $this->formHidden($form->get('img'));
                             ?>
                             
-                            <?php echo $this->partial('event-admin/_partials/fileupload.phtml'); ?>
+                            <?php echo $this->partial('mdjaman-event-admin/_partials/fileupload.phtml'); ?>
                             <?php
                             echo $this->formRow($form->get('active'));
                             echo $this->formRow($form->get('feature'));
