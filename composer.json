@@ -6,6 +6,7 @@
         "zf2",
         "zend",
         "module",
+        "event",
         "blog",
         "cms"
     ],
