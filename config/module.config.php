@@ -26,35 +26,35 @@
 return array(
     'service_manager' => array(
         'factories' => array(
-            'Event\Options\ModuleOptions'        => \MdjamanEvent\Factory\Options\ModuleOptionsFactory::class,
+            'MdjamanEvent\Options\ModuleOptions'    => \MdjamanEvent\Factory\Options\ModuleOptionsFactory::class,
 
-            'Event\Service\Event'                => \MdjamanEvent\Factory\Service\EventServiceFactory::class,
-            'Event\Service\Type'                 => \MdjamanEvent\Factory\Service\TypeServiceFactory::class,
-            'Event\Service\Tag'                  => \MdjamanEvent\Factory\Service\TagServiceFactory::class,
+            'MdjamanEvent\Service\Event'            => \MdjamanEvent\Factory\Service\EventServiceFactory::class,
+            'MdjamanEvent\Service\Type'             => \MdjamanEvent\Factory\Service\TypeServiceFactory::class,
+            'MdjamanEvent\Service\Tag'              => \MdjamanEvent\Factory\Service\TagServiceFactory::class,
 
-            'Event\Repository\Event'             => \MdjamanEvent\Factory\Repository\EventRepositoryFactory::class,
-            'Event\Repository\Type'              => \MdjamanEvent\Factory\Repository\TypeRepositoryFactory::class,
-            'Event\Repository\Tag'               => \MdjamanEvent\Factory\Repository\TagRepositoryFactory::class,
+            'Event\Repository\Event'                => \MdjamanEvent\Factory\Repository\EventRepositoryFactory::class,
+            'Event\Repository\Type'                 => \MdjamanEvent\Factory\Repository\TypeRepositoryFactory::class,
+            'Event\Repository\Tag'                  => \MdjamanEvent\Factory\Repository\TagRepositoryFactory::class,
 
-            'Event\Filter\Event'                 => \MdjamanEvent\Factory\Filter\EventFilterFactory::class,
+            'Event\Filter\Event'                    => \MdjamanEvent\Factory\Filter\EventFilterFactory::class,
 
-            'EventAdmin\Form\Event'              => \MdjamanEventAdmin\Factory\Form\EventFormFactory::class,
+            'MdjamanEventAdmin\Form\Event'          => \MdjamanEventAdmin\Factory\Form\EventFormFactory::class,
         ),
         'invokables' => array(
-            'Event\Filter\Type'                  => \MdjamanEvent\Filter\TypeFilter::class,
-            'Event\Filter\Tag'                   => \MdjamanEvent\Filter\TagFilter::class,
+            'MdjamanEvent\Filter\Type'              => \MdjamanEvent\Filter\TypeFilter::class,
+            'MdjamanEvent\Filter\Tag'               => \MdjamanEvent\Filter\TagFilter::class,
         )
     ),
 
     'controllers' => array(
         'factories' => array(
-            'Event\Controller\Event'                => \MdjamanEvent\Factory\Controller\EventControllerFactory::class,
-            'Event\Controller\Type'                 => \MdjamanEvent\Factory\Controller\TypeControllerFactory::class,
+            'MdjamanEvent\Controller\Event'         => \MdjamanEvent\Factory\Controller\EventControllerFactory::class,
+            'MdjamanEvent\Controller\Type'          => \MdjamanEvent\Factory\Controller\TypeControllerFactory::class,
 
-            'EventAdmin\Controller\Event'           => \MdjamanEventAdmin\Factory\Controller\EventControllerFactory::class,
-            'EventAdmin\Controller\Type'            => \MdjamanEventAdmin\Factory\Controller\TypeControllerFactory::class,
-            'EventAdmin\Controller\Tag'             => \MdjamanEventAdmin\Factory\Controller\TagControllerFactory::class,
-            'EventAdmin\Controller\Upload'          => \MdjamanEventAdmin\Factory\Controller\UploadControllerFactory::class,
+            'MdjamanEventAdmin\Controller\Event'    => \MdjamanEventAdmin\Factory\Controller\EventControllerFactory::class,
+            'MdjamanEventAdmin\Controller\Type'     => \MdjamanEventAdmin\Factory\Controller\TypeControllerFactory::class,
+            'MdjamanEventAdmin\Controller\Tag'      => \MdjamanEventAdmin\Factory\Controller\TagControllerFactory::class,
+            'MdjamanEventAdmin\Controller\Upload'   => \MdjamanEventAdmin\Factory\Controller\UploadControllerFactory::class,
         ),
     ),
 
@@ -85,7 +85,7 @@ return array(
 
             'orm_default' => array(
                 'drivers' => array(
-                    'Event\Entity' => 'event_driver',
+                    'MdjamanEvent\Entity' => 'event_driver',
                 ),
             ),
         ),
