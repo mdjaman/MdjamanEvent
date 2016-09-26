@@ -59,7 +59,6 @@ return array(
     ),
 
     'view_manager' => array(
-        'template_map'             => include __DIR__  .'/../template_map.php',
         'template_path_stack' => array(
             __DIR__ . '/../view',
         ),
