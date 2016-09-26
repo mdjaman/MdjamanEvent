@@ -102,7 +102,7 @@ return array(
                 'options' => [
                     'route' => '/event',
                     'defaults' => [
-                        '__NAMESPACE__' => 'Event\Controller',
+                        '__NAMESPACE__' => 'MdjamanEvent\Controller',
                         'controller' => 'Event',
                         'action' => 'index',
                     ],
@@ -181,7 +181,7 @@ return array(
                         'options' => [
                             'route' => '/event',
                             'defaults' => [
-                                '__NAMESPACE__' => 'EventAdmin\Controller',
+                                '__NAMESPACE__' => 'MdjamanEventAdmin\Controller',
                                 'controller' => 'Event',
                                 'action' => 'index',
                             ],
