@@ -651,6 +651,7 @@ $(document).ready(function () {
                 } else {
                     bootstrapTableCls.editRow(response.data);
                 }
+                utils.launchNotification('Evènement', response.msg, 'success');
                 $('#modal-container').modal("hide");
             },
             error: function (reponse) {

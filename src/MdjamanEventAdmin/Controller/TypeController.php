@@ -25,7 +25,7 @@
 
 namespace MdjamanEventAdmin\Controller;
 
-use Application\Utils\ExceptionUtils;
+use MdjamanCommon\Utils\ExceptionUtils;
 use MdjamanEvent\Entity\TypeInterface;
 use MdjamanEvent\Exception\TypeNotFoundException;
 use MdjamanEvent\Options\ModuleOptionsInterface;
@@ -141,7 +141,6 @@ class TypeController extends AbstractActionController
                 $message = sprintf(_('Type %s introuvable'), $id);
                 throw new TypeNotFoundException($message);
             }
-
         } catch (TypeNotFoundException $ex) {
             $msg = sprintf(
                 "%s:%d %s (%d) [%s]\n", $ex->getFile(), $ex->getLine(), $ex->getMessage(), $ex->getCode(), get_class($ex)
@@ -193,7 +192,7 @@ class TypeController extends AbstractActionController
 
                 if (!$filter->isValid()) {
                     throw new \Exception(
-
+                        sprintf(ExceptionUtils::FORM_VALIDATE_ERR, TypeFilter::class),
                         500
                     );
                 }
@@ -238,6 +237,106 @@ class TypeController extends AbstractActionController
         }
 
         return new ViewModel();
+    }
+
+    /**
+     * @return \Zend\Http\Response|JsonModel|ViewModel
+     * @throws \Exception
+     */
+    public function editAction()
+    {
+        $resultJson = [
+            'code' => 0,
+            'msg' => 'There was some error. Try again.',
+            'data' => null,
+        ];
+        $request = $this->getRequest();
+        $id = $this->params()->fromRoute('id');
+
+        $service = $this->getTypeService();
+
+        try {
+            $document = $service->find($id);
+            if (!$document) {
+                throw new TypeNotFoundException(sprintf(_('Type %s introuvable'), $id), 404);
+            }
+        } catch (TypeNotFoundException $ex) {
+            $msg = sprintf(
+                "%s:%d %s (%d) [%s]\n", $ex->getFile(), $ex->getLine(), $ex->getMessage(), $ex->getCode(), get_class($ex)
+            );
+            $service->getLogger()->warn($msg);
+
+            $errMsg = $ex->getMessage();
+            $this->flashMessenger()->addMessage($errMsg);
+
+            if ($request->isXmlHttpRequest()) {
+                $resultJson['msg'] = $errMsg;
+                return new JsonModel($resultJson);
+            }
+
+            return $this->redirect()->toRoute('zfcadmin/event/type');
+        }
+
+        $filter = $this->getInputFilter();
+
+        if ($request->isPost()) {
+            try {
+                $data = $request->getPost();
+                $data['id'] = $id;
+                $filter->setData($data)
+                    ->setValidationGroup(InputFilterInterface::VALIDATE_ALL);
+
+                if (!$filter->isValid()) {
+                    throw new \Exception(
+                        sprintf(ExceptionUtils::FORM_VALIDATE_ERR, get_class($filter)),
+                        500
+                    );
+                }
+
+                $type = $service->savetype($filter->getValues());
+                if (!$type) {
+                    throw new \Exception(sprintf(_('Echec mise à jour du mot-clé %s'), $id), 500);
+                }
+
+                $message = sprintf('Mot-clé %s mis à jour avec succès', $type->getName());
+
+                if ($request->isXmlHttpRequest()) {
+                    $resultJson['code'] = 1;
+                    $resultJson['msg'] = $message;
+                    $resultJson['data'] = $service->serialize($type);
+                    return new JsonModel($resultJson);
+                }
+
+                return $this->redirect()->toRoute('zfcadmin/event/type/view', [
+                    'id' => $type->getId(),
+                ]);
+            } catch (\Exception $ex) {
+                $msg = sprintf(
+                    "%s:%d %s (%d) [%s]\n", $ex->getFile(), $ex->getLine(), $ex->getMessage(), $ex->getCode(), get_class($ex)
+                );
+                $service->getLogger()->err($msg);
+
+                $errMsg = $ex->getMessage();
+                $this->flashMessenger()->addMessage($errMsg);
+
+                if ($request->isXmlHttpRequest()) {
+                    $resultJson['msg'] = $errMsg;
+                    return new JsonModel($resultJson);
+                }
+
+                return new ViewModel([
+                    'type' => $document,
+                ]);
+            }
+        }
+
+        if ($request->isXmlHttpRequest()) {
+            return new JsonModel($resultJson);
+        }
+
+        return new ViewModel(array(
+            'type' => $document
+        ));
     }
 
     /**

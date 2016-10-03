@@ -25,7 +25,7 @@
 
 namespace MdjamanEventAdmin\Controller;
 
-use Application\Utils\ExceptionUtils;
+use MdjamanCommon\Utils\ExceptionUtils;
 use MdjamanEvent\Entity\EventInterface;
 use MdjamanEvent\Exception\TagNotFoundException;
 use MdjamanEvent\Options\ModuleOptionsInterface;
@@ -171,7 +171,7 @@ class TagController extends AbstractActionController
     }
 
     /**
-     * Add an event
+     * Add a tag
      * @return \Zend\Http\Response|JsonModel|ViewModel
      */
     public function addAction()
@@ -193,7 +193,7 @@ class TagController extends AbstractActionController
 
                 if (!$filter->isValid()) {
                     throw new \Exception(
-
+                        _('Echec lors de la création du mot-clé'),
                         500
                     );
                 }
@@ -204,7 +204,7 @@ class TagController extends AbstractActionController
                 $tag = $service->saveEvent($filteredValues);
                 if (!$tag) {
                     throw new \Exception(
-                        sprintf(ExceptionUtils::PERSISTENCE_ERR, $service->getEntity()),
+                        _('Echec lors de la création du mot-clé'),
                         500
                     );
                 }
@@ -238,6 +238,106 @@ class TagController extends AbstractActionController
         }
 
         return new ViewModel();
+    }
+
+    /**
+     * @return \Zend\Http\Response|JsonModel|ViewModel
+     * @throws \Exception
+     */
+    public function editAction()
+    {
+        $resultJson = [
+            'code' => 0,
+            'msg' => 'There was some error. Try again.',
+            'data' => null,
+        ];
+        $request = $this->getRequest();
+        $id = $this->params()->fromRoute('id');
+
+        $service = $this->gettagService();
+
+        try {
+            $document = $service->find($id);
+            if (!$document) {
+                throw new tagNotFoundException(sprintf(_('Mot-clé %s introuvable'), $id), 404);
+            }
+        } catch (tagNotFoundException $ex) {
+            $msg = sprintf(
+                "%s:%d %s (%d) [%s]\n", $ex->getFile(), $ex->getLine(), $ex->getMessage(), $ex->getCode(), get_class($ex)
+            );
+            $service->getLogger()->warn($msg);
+
+            $errMsg = $ex->getMessage();
+            $this->flashMessenger()->addMessage($errMsg);
+
+            if ($request->isXmlHttpRequest()) {
+                $resultJson['msg'] = $errMsg;
+                return new JsonModel($resultJson);
+            }
+
+            return $this->redirect()->toRoute('zfcadmin/event/tag');
+        }
+
+        $filter = $this->getInputFilter();
+
+        if ($request->isPost()) {
+            try {
+                $data = $request->getPost();
+                $data['id'] = $id;
+                $filter->setData($data)
+                    ->setValidationGroup(InputFilterInterface::VALIDATE_ALL);
+
+                if (!$filter->isValid()) {
+                    throw new \Exception(
+                        sprintf(ExceptionUtils::FORM_VALIDATE_ERR, get_class($filter)),
+                        500
+                    );
+                }
+
+                $tag = $service->savetag($filter->getValues());
+                if (!$tag) {
+                    throw new \Exception(sprintf(_('Echec mise à jour du mot-clé %s'), $id), 500);
+                }
+
+                $message = sprintf('Mot-clé %s mis à jour avec succès', $tag->getName());
+
+                if ($request->isXmlHttpRequest()) {
+                    $resultJson['code'] = 1;
+                    $resultJson['msg'] = $message;
+                    $resultJson['data'] = $service->serialize($tag);
+                    return new JsonModel($resultJson);
+                }
+
+                return $this->redirect()->toRoute('zfcadmin/event/tag/view', [
+                    'id' => $tag->getId(),
+                ]);
+            } catch (\Exception $ex) {
+                $msg = sprintf(
+                    "%s:%d %s (%d) [%s]\n", $ex->getFile(), $ex->getLine(), $ex->getMessage(), $ex->getCode(), get_class($ex)
+                );
+                $service->getLogger()->err($msg);
+
+                $errMsg = $ex->getMessage();
+                $this->flashMessenger()->addMessage($errMsg);
+
+                if ($request->isXmlHttpRequest()) {
+                    $resultJson['msg'] = $errMsg;
+                    return new JsonModel($resultJson);
+                }
+
+                return new ViewModel([
+                    'tag' => $document,
+                ]);
+            }
+        }
+
+        if ($request->isXmlHttpRequest()) {
+            return new JsonModel($resultJson);
+        }
+
+        return new ViewModel(array(
+            'tag' => $document
+        ));
     }
 
     /**
