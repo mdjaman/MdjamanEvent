@@ -109,68 +109,56 @@ return array(
                 ],
                 'may_terminate' => true,
                 'child_routes' => [
-                    'event' => [
-                        'type' => 'Literal',
+                    'view' => [
+                        'type' => 'Segment',
                         'options' => [
-                            'route' => '/event',
+                            'route' => '/[:id]',
                             'defaults' => [
-                                'action' => 'index',
+                                'action' => 'view',
                             ],
-                        ],
-                        'may_terminate' => true,
-                        'child_routes' => [
-                            'view' => [
-                                'type' => 'Segment',
-                                'options' => [
-                                    'route' => '/[:id]',
-                                    'defaults' => [
-                                        'action' => 'view',
-                                    ],
-                                    'constraints' => [
-                                        'id'  => '[a-zA-Z0-9-_.]+',
-                                    ],
-                                ],
+                            'constraints' => [
+                                'id'  => '[a-zA-Z0-9-_.]+',
                             ],
-                            'type' => array(
-                                'type'    => 'Segment',
-                                'options' => array(
-                                    'route'    => '/type/[:alias]',
-                                    'defaults' => array(
-                                        'action' => 'view',
-                                    ),
-                                    'constraints' => array(
-                                        'alias' => '[a-zA-Z0-9-_.]+',
-                                    ),
-                                ),
-                            ),
-                            'tag' => array(
-                                'type'    => 'Segment',
-                                'options' => array(
-                                    'route'    => '/tag/[:alias]',
-                                    'defaults' => array(
-                                        'controller' => 'Event',
-                                        'action' => 'tag',
-                                    ),
-                                    'constraints' => array(
-                                        'alias' => '[a-zA-Z0-9-_.]+',
-                                    ),
-                                ),
-                            ),
-                            'feed' => array(
-                                'type'    => 'segment',
-                                'options' => array(
-                                    'route'    => '/feed[/:type]',
-                                    'defaults' => array(
-                                        'controller' => 'Event',
-                                        'action' => 'feed',
-                                    ),
-                                    'constraints' => array(
-                                        'type' => '(rss|atom)',
-                                    ),
-                                ),
-                            ),
                         ],
                     ],
+                    'type' => array(
+                        'type'    => 'Segment',
+                        'options' => array(
+                            'route'    => '/type/[:alias]',
+                            'defaults' => array(
+                                'action' => 'view',
+                            ),
+                            'constraints' => array(
+                                'alias' => '[a-zA-Z0-9-_.]+',
+                            ),
+                        ),
+                    ),
+                    'tag' => array(
+                        'type'    => 'Segment',
+                        'options' => array(
+                            'route'    => '/tag/[:alias]',
+                            'defaults' => array(
+                                'controller' => 'Event',
+                                'action' => 'tag',
+                            ),
+                            'constraints' => array(
+                                'alias' => '[a-zA-Z0-9-_.]+',
+                            ),
+                        ),
+                    ),
+                    'feed' => array(
+                        'type'    => 'segment',
+                        'options' => array(
+                            'route'    => '/feed[/:type]',
+                            'defaults' => array(
+                                'controller' => 'Event',
+                                'action' => 'feed',
+                            ),
+                            'constraints' => array(
+                                'type' => '(rss|atom)',
+                            ),
+                        ),
+                    ),
                 ],
             ],
             
