@@ -25,6 +25,8 @@
 
 namespace MdjamanEvent\Entity;
 
+use Doctrine\Common\Collections\Collection;
+
 /**
  * Class Event
  * @package Event\Entity
@@ -193,5 +195,26 @@ interface EventInterface
      * @return string
      */
     public function getImg();
+
+    /**
+     * Add tag
+     *
+     * @param Collection $tags
+     * @return $this
+     */
+    public function addTags(Collection $tags);
+
+    /**
+     * @param Collection $tags
+     * @return $this
+     */
+    public function removeTags(Collection $tags);
+
+    /**
+     * Get tags
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getTags();
 
 }

@@ -139,26 +139,26 @@ class EventController extends AbstractActionController
     public function viewAction()
     {
         $request = $this->getRequest();
-        $service = $this->getEventService();
-        $id = $this->params()->fromRoute('id', 0);
+        $id = $this->params()->fromRoute('alias', '');
+        $fromAdmin = $this->params()->fromQuery('fromAdmin', 0);
         $resultJson = [
             'code' => 0,
             'msg' => 'There was some error. Try again.',
             'data' => null,
         ];
 
-        if ($id === 0) {
+        if ($id === '') {
             return $this->forward()->dispatch('MdjamanEvent\Controller\Event', ['action' => 'index']);
         }
 
+        $service = $this->getEventService();
         try {
-            $event = $service->find($id);
-
+            $active = ($fromAdmin === 0) ? true : false;
+            $event = $service->getRepository()->findOneByAlias($id, $active);
             if (!$event) {
                 $message = sprintf(_('Evènement %s introuvable'), $id);
                 throw new Exception\EventNotFoundException($message);
             }
-
         } catch (Exception\EventNotFoundException $ex) {
             $msg = sprintf(
                 "%s:%d %s (%d) [%s]\n", $ex->getFile(), $ex->getLine(), $ex->getMessage(), $ex->getCode(), get_class($ex)
