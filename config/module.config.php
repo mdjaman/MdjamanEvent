@@ -112,7 +112,7 @@ return array(
                     'view' => [
                         'type' => 'Segment',
                         'options' => [
-                            'route' => '/[:id]',
+                            'route' => '/[:alias]',
                             'defaults' => [
                                 'action' => 'view',
                             ],
