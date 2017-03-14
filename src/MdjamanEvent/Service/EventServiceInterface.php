@@ -25,13 +25,14 @@
 
 namespace MdjamanEvent\Service;
 
+use MdjamanCommon\Service\AbstractServiceInterface;
 use MdjamanEvent\Entity\EventInterface;
 
 /**
  * Interface EventServiceInterface
  * @package Event\Service
  */
-interface EventServiceInterface
+interface EventServiceInterface extends AbstractServiceInterface
 {
     /**
      * Persists Event
@@ -52,5 +53,11 @@ interface EventServiceInterface
      * @return mixed
      */
     public function countEvents($filters);
+
+    /**
+     * Increment event hits
+     * @param EventInterface $event
+     */
+    public function incrementEventHits(EventInterface $event);
     
 }

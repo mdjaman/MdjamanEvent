@@ -169,29 +169,6 @@ class EventService extends AbstractService implements EventServiceInterface
 
     /**
      * @param array $filters
-     * @param array|null $orderBy
-     * @param null $limit
-     * @param null $offset
-     * @return array
-     */
-    public function filters(array $filters, array $orderBy = null, $limit = null, $offset = null)
-    {
-        $matches = $this->getMatchingRecords($filters, $orderBy, $limit, $offset);
-        return $matches->toArray();
-    }
-
-    /**
-     * @param $filters
-     * @return int
-     */
-    public function countMatchingRecords($filters)
-    {
-        $matches = $this->getMatchingRecords($filters);
-        return (int)$matches->count();
-    }
-
-    /**
-     * @param array $filters
      * @return Criteria
      */
     protected function buildCriteria(array $filters)
@@ -217,16 +194,15 @@ class EventService extends AbstractService implements EventServiceInterface
     }
 
     /**
-     * @param array $filters
-     * @param array|null $orderBy
-     * @param null $limit
-     * @param null $offset
-     * @return mixed
+     * Increment event hits
+     * @param EventInterface $event
      */
-    protected function getMatchingRecords(array $filters, array $orderBy = null, $limit = null, $offset = null)
+    public function incrementEventHits(EventInterface $event)
     {
-        $criteria = $this->buildCriteria($filters);
-        return $this->getRepository()->matching($criteria, $orderBy, $limit, $offset);
+        $hits = $event->getHits();
+        $event->setHits(++$hits);
+
+        $this->objectManager->flush();
     }
-    
+
 }
