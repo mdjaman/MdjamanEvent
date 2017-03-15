@@ -107,10 +107,14 @@ class EventController extends AbstractActionController
         $events = $service->filters($filteredValues, [$sort => $dir], $limit, $offset);
 
         if ($request->isXmlHttpRequest()) {
+            $data = [];
+            foreach ($events as $entity) {
+                $data[] = $service->serialize($entity, 'json', 'details');
+            }
             $resultJson['code'] = 1;
             $resultJson['msg'] = 'success';
-            $resultJson['data'] = $service->serialize($events);
-            $resultJson['total'] = $service->countMatchingRecords($filters);
+            $resultJson['data'] = $data;
+            $resultJson['total'] = $service->countMatchingRecords($filteredValues);
             return new JsonModel($resultJson);
         }
 
